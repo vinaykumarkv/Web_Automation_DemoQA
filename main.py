@@ -31,9 +31,33 @@ password_field.send_keys('Sample@123')
 
 # 4. Handle the Login Button using a JavaScript click
 # This is the most reliable way to click if elements are obscured by footer ads
-login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'login')))
+#login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'login')))
+login_button = driver.find_element(By.ID, 'login')
 driver.execute_script("arguments[0].click();", login_button)
 
+#locate elements dropdown and textbox
+element_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="app"]/div/div/div/div[1]/div/div/div[1]/span/div/div[1]')))
+driver.execute_script("arguments[0].click();", element_field)
+text_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[2]/div/div/div/div[1]/div/div/div[1]/div/ul/li[1]/span')))
+driver.execute_script("arguments[0].click();", text_field)
+#locate the form fields
+name_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'userName')))
+
+user_email_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'userEmail')))
+
+user_current_address_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'currentAddress')))
+
+user_permanent_address_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'permanentAddress')))
+
+submit_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'submit')))
+
+#fill in the form fields
+name_field.send_keys('Sample')
+user_email_field.send_keys('sampleandsample@sample.com')
+user_current_address_field.send_keys('123, 1st street, sample, sample - pin123')
+user_permanent_address_field.send_keys('123, 1st street, sample, sample - pin123')
+# submit_field.click()
+driver.execute_script("arguments[0].click();", submit_field)
 
 input("Press Enter to close the browser")
 driver.quit()
