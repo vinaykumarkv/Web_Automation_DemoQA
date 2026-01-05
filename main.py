@@ -4,61 +4,118 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import os
+import keyboard
 
-chrome_options = Options()
-# chrome_options.add_argument('--disable-search-engine-choice-screen')
-chrome_options.add_argument('--no-sandbox')
-service = Service('chromedriver-win64/chromedriver.exe')
-driver = webdriver.Chrome(options=chrome_options,service=service)
+class WebAutomation:
+    def __init__(self):
+        self.download_path = os.getcwd()
+        self.prefs = {'download.default_directory': self.download_path}
 
+        self.chrome_options = Options()
+        # chrome_options.add_argument('--disable-search-engine-choice-screen')
+        self.chrome_options.add_argument('--no-sandbox')
+        self.chrome_options.add_experimental_option('prefs', self.prefs)
 
-driver.get('https://demoqa.com/login')
+        self.service = Service('chromedriver-win64/chromedriver.exe')
+        self.driver = webdriver.Chrome(options=self.chrome_options, service=self.service)
 
-# 1. Ensure the window is maximized to avoid element overlapping
-driver.maximize_window()
+    def login(self, username, password):
+        self.username = username
+        self.password = password
+        self.driver.get('https://demoqa.com/login')
 
-# 2. Wait for and fill Username
-username_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'userName')))
-driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", username_field)
-username_field.clear()
-username_field.send_keys('sampleandsample')
+        self.driver.maximize_window()
 
-# 3. Use JavaScript to scroll and fill Password (bypasses most overlay issues)
-password_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'password')))
-driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", password_field)
-password_field.clear()
-password_field.send_keys('Sample@123')
+        self.username_field = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'userName')))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", self.username_field)
+        self.username_field.clear()
+        self.username_field.send_keys(self.username)
 
-# 4. Handle the Login Button using a JavaScript click
-# This is the most reliable way to click if elements are obscured by footer ads
-#login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'login')))
-login_button = driver.find_element(By.ID, 'login')
-driver.execute_script("arguments[0].click();", login_button)
+        self.password_field = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'password')))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", self.password_field)
+        self.password_field.clear()
+        self.password_field.send_keys(self.password)
 
-#locate elements dropdown and textbox
-element_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="app"]/div/div/div/div[1]/div/div/div[1]/span/div/div[1]')))
-driver.execute_script("arguments[0].click();", element_field)
-text_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[2]/div/div/div/div[1]/div/div/div[1]/div/ul/li[1]/span')))
-driver.execute_script("arguments[0].click();", text_field)
-#locate the form fields
-name_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'userName')))
+        # login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'login')))
+        self.login_button = self.driver.find_element(By.ID, 'login')
+        self.driver.execute_script("arguments[0].click();", self.login_button)
 
-user_email_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'userEmail')))
+    def fillform(self, fullname, email, currentaddress, permanentaddress):
+        # locate elements dropdown and textbox
+        self.fullname = fullname
+        self.email = email
+        self.currentaddress = currentaddress
+        self.permanentaddress = permanentaddress
+        self.element_field = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div/div/div/div[1]/div/div/div[1]/span/div/div[1]')))
+        self.driver.execute_script("arguments[0].click();", self.element_field)
+        text_field = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+            (By.XPATH, '/html/body/div[2]/div/div/div/div[1]/div/div/div[1]/div/ul/li[1]/span')))
+        self.driver.execute_script("arguments[0].click();", text_field)
 
-user_current_address_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'currentAddress')))
+        # locate the form fields
+        self.name_field = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'userName')))
 
-user_permanent_address_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'permanentAddress')))
+        self.user_email_field = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'userEmail')))
 
-submit_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,'submit')))
+        self.user_current_address_field = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.ID, 'currentAddress')))
 
-#fill in the form fields
-name_field.send_keys('Sample')
-user_email_field.send_keys('sampleandsample@sample.com')
-user_current_address_field.send_keys('123, 1st street, sample, sample - pin123')
-user_permanent_address_field.send_keys('123, 1st street, sample, sample - pin123')
-# submit_field.click()
-driver.execute_script("arguments[0].click();", submit_field)
+        self.user_permanent_address_field = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.ID, 'permanentAddress')))
 
-input("Press Enter to close the browser")
-driver.quit()
+        self.submit_field = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'submit')))
+
+        # fill in the form fields
+        self.name_field.send_keys(self.fullname)
+        self.user_email_field.send_keys(self.email)
+        self.user_current_address_field.send_keys(self.currentaddress)
+        self.user_permanent_address_field.send_keys(self.permanentaddress)
+        # submit_field.click()
+        self.driver.execute_script("arguments[0].click();", self.submit_field)
+
+    def download(self):
+        # upload / download
+
+        def clean_demoqa_ui(driver):
+            # This script removes the footer, the fixed ad banner, and any Google ad containers
+            script = """
+            var selectors = ['#fixedban', 'footer', '#adplus-anchor', '.google-auto-placed'];
+            selectors.forEach(function(selector) {
+                var elements = document.querySelectorAll(selector);
+                elements.forEach(function(el) { el.remove(); });
+            });
+            """
+            driver.execute_script(script)
+
+        clean_demoqa_ui(self.driver)
+
+        self.upload_download_option = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, 'item-7'))
+        )
+
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", self.upload_download_option)
+
+        self.driver.execute_script("arguments[0].click();", self.upload_download_option)
+
+        self.download_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'downloadButton')))
+        # upload_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID,'uploadFile')))
+
+        self.download_button.click()
+
+    def close(self):
+        self.driver.quit()
+
+if __name__ == "__main__":
+    driver = WebAutomation()
+    driver.login("sampleandsample", "Sample@123")
+    driver.fillform("sampleandsample", "sampleandsample@sample.com", "123, 1st cross, sample street, pincode123", "123, 1st cross, sample street, pincode123")
+    driver.download()
+    while True:
+        if keyboard.is_pressed('q'):
+            print("Exiting...")
+            break
+    driver.close()
+
 
